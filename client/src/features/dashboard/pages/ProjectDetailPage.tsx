@@ -9,11 +9,11 @@ import { useCurrentProject } from "@/providers/CurrentProjectContext";
 import type { Project } from "../types/project";
 
 const quickLinks = [
-  { to: "/questionnaires", label: "Questionnaires", icon: ClipboardList },
-  { to: "/data", label: "Data", icon: Database },
-  { to: "/analysis", label: "Analysis", icon: BarChart3 },
-  { to: "/literature", label: "Literature", icon: BookOpen },
-  { to: "/reports", label: "Reports", icon: FileText },
+  { to: "/app/questionnaires", label: "Questionnaires", icon: ClipboardList },
+  { to: "/app/data", label: "Data", icon: Database },
+  { to: "/app/analysis", label: "Analysis", icon: BarChart3 },
+  { to: "/app/literature", label: "Literature", icon: BookOpen },
+  { to: "/app/reports", label: "Reports", icon: FileText },
 ];
 
 export function ProjectDetailPage() {
@@ -36,7 +36,7 @@ export function ProjectDetailPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <Link to="/" className="flex w-fit items-center gap-1.5 text-secondary text-ink-muted hover:text-ink">
+      <Link to="/app" className="flex w-fit items-center gap-1.5 text-secondary text-ink-muted hover:text-ink">
         <ArrowLeft className="h-4 w-4" /> Back to dashboard
       </Link>
       <div>

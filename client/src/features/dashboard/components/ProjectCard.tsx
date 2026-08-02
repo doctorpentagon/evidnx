@@ -12,7 +12,7 @@ const typeLabel: Record<Project["projectType"], string> = {
 
 export function ProjectCard({ project }: { project: Project }) {
   return (
-    <Link to={`/projects/${project.id}`}>
+    <Link to={`/app/projects/${project.id}`}>
       <Card className="flex h-full flex-col gap-4 p-5 transition-shadow hover:shadow-lg">
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0">
