@@ -1,3 +1,5 @@
+import jStat from "jstat";
+
 /** Core numeric primitives shared by dataset cleaning and every analysis module. */
 
 export function mean(values: number[]): number {
@@ -106,12 +108,16 @@ export interface DescriptiveSummary {
   skewness: number;
   kurtosis: number;
   standardError: number;
+  confidenceInterval95: { lower: number; upper: number };
 }
 
 export function describe(values: number[]): DescriptiveSummary {
+  const se = standardError(values);
+  const criticalT = values.length > 1 ? jStat.studentt.inv(0.975, values.length - 1) : NaN;
+  const average = mean(values);
   return {
     n: values.length,
-    mean: mean(values),
+    mean: average,
     median: median(values),
     mode: mode(values),
     sum: sum(values),
@@ -124,7 +130,8 @@ export function describe(values: number[]): DescriptiveSummary {
     q3: quantile(values, 0.75),
     skewness: skewness(values),
     kurtosis: kurtosis(values),
-    standardError: standardError(values),
+    standardError: se,
+    confidenceInterval95: { lower: average - criticalT * se, upper: average + criticalT * se },
   };
 }
 

@@ -13,6 +13,8 @@ describe("golden statistical core", () => {
     expect(result.median).toBeCloseTo(6, 12);
     expect(result.variance).toBeCloseTo(10, 12);
     expect(result.stdDev).toBeCloseTo(Math.sqrt(10), 12);
+    expect(result.confidenceInterval95.lower).toBeCloseTo(2.0735, 3);
+    expect(result.confidenceInterval95.upper).toBeCloseTo(9.9265, 3);
   });
 
   it("matches a known one-sample t statistic", () => {

@@ -136,6 +136,9 @@ export const analysisService = {
     switch (type) {
       case "descriptive": {
         const columnIds = config.columnIds as number[];
+        if (!Array.isArray(columnIds) || columnIds.length < 1) {
+          throw AppError.badRequest("Descriptive statistics require at least one variable.");
+        }
         type DescriptiveColumn =
           | { columnId: number; name: string; type: "metric"; summary: ReturnType<typeof describe> }
           | { columnId: number; name: string; type: "nominal" | "ordinal"; frequency: ReturnType<typeof frequencyTable> };
@@ -146,6 +149,7 @@ export const analysisService = {
             if (!col) throw AppError.notFound("Column", id);
             if (col.measurementType === "metric") {
               const values = await numericValues(datasetId, id);
+              if (values.length < 2) throw AppError.badRequest(`${col.name} needs at least two numeric observations.`);
               return { columnId: id, name: col.name, type: "metric" as const, summary: describe(values) };
             }
             const values = await datasetService.getColumnValues(datasetId, id);

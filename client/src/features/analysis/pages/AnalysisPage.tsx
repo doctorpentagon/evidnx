@@ -11,6 +11,7 @@ import { useDatasets } from "@/features/data/hooks/useDatasets";
 import { useAnalyses, useRecommendAnalysis, useRunAnalysis } from "../hooks/useAnalysis";
 import type { AnalysisRecord, AnalysisType, TestRecommendation } from "../types/analysis";
 import { RelationshipAnalysisPanel } from "../components/RelationshipAnalysisPanel";
+import { DescriptiveAnalysisPanel } from "../components/DescriptiveAnalysisPanel";
 
 const names: Record<AnalysisType, string> = {
   descriptive: "Descriptive statistics",
@@ -135,7 +136,8 @@ export function AnalysisPage() {
 
         <aside className="space-y-5"><Card className="p-4"><div className="flex items-center gap-2"><BarChart3 className="h-5 w-5 text-brand-600" /><h2 className="font-semibold">Live data preview</h2></div><dl className="mt-4 grid grid-cols-3 gap-2 text-center"><div className="rounded-md bg-surface-canvas p-2"><dt className="text-xs text-ink-muted">Rows</dt><dd className="font-semibold">{dataset.data?.rows.length ?? 0}</dd></div><div className="rounded-md bg-surface-canvas p-2"><dt className="text-xs text-ink-muted">Groups</dt><dd className="font-semibold">{chartData.length}</dd></div><div className="rounded-md bg-surface-canvas p-2"><dt className="text-xs text-ink-muted">Variables</dt><dd className="font-semibold">{dataset.data?.columns.length ?? 0}</dd></div></dl><div className="mt-4 space-y-2">{chartData.slice(0, 6).map((item) => <div key={item.group} className="flex justify-between text-sm"><span className="truncate text-ink-muted">{item.group}</span><span className="ml-3 font-medium">M {item.mean.toFixed(2)} · n {item.n}</span></div>)}</div></Card><Card className="p-4"><h2 className="font-semibold">Recent analyses</h2><div className="mt-3 space-y-3">{history.data?.slice(0, 5).map((item) => <button key={item.id} onClick={() => setResult(item)} className="block min-h-11 w-full rounded-md border border-surface-border p-3 text-left hover:border-brand-200"><p className="line-clamp-2 text-sm font-medium">{item.title}</p><p className="mt-1 text-xs text-ink-muted">{item.status} · {new Date(item.createdAt).toLocaleDateString()}</p></button>)}{!history.data?.length ? <p className="text-sm text-ink-muted">Your completed analyses will appear here.</p> : null}</div></Card></aside>
       </div>
-      {dataset.data ? <RelationshipAnalysisPanel key={dataset.data.id} dataset={dataset.data} projectId={currentProjectId} /> : null}
+      {dataset.data ? <DescriptiveAnalysisPanel key={`descriptive-${dataset.data.id}`} dataset={dataset.data} projectId={currentProjectId} /> : null}
+      {dataset.data ? <RelationshipAnalysisPanel key={`relationships-${dataset.data.id}`} dataset={dataset.data} projectId={currentProjectId} /> : null}
       {(recommend.error || run.error) ? <div className="rounded-md border border-error-100 bg-error-50 p-3 text-sm text-error-600">{(recommend.error ?? run.error)?.message}</div> : null}
     </div>
   );
