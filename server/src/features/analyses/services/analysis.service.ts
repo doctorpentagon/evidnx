@@ -349,11 +349,20 @@ export const analysisService = {
 
       case "correlation": {
         const { columnIds, method } = config as { columnIds: number[]; method: "pearson" | "spearman" | "kendall" };
+        if (!Array.isArray(columnIds) || columnIds.length < 2) {
+          throw AppError.badRequest("Correlation requires at least two numeric variables.");
+        }
         const names = await Promise.all(columnIds.map(columnName));
         const rows = await datasetRepository.getRows(datasetId);
+        const completeRows = rows
+          .map((row) => columnIds.map((id) => Number(row.data[String(id)])))
+          .filter((values) => values.every((value) => Number.isFinite(value)));
+        if (completeRows.length < 3) {
+          throw AppError.badRequest("Correlation requires at least three complete paired observations.");
+        }
         const columns = columnIds.map((id, i) => ({
           name: names[i],
-          values: rows.map((r) => Number(r.data[String(id)])).filter((v) => !Number.isNaN(v)),
+          values: completeRows.map((row) => row[i]),
         }));
 
         if (columnIds.length === 2) {
@@ -376,12 +385,19 @@ export const analysisService = {
 
       case "linear_regression": {
         const { dvColumnId, ivColumnIds } = config as { dvColumnId: number; ivColumnIds: number[] };
+        if (!Array.isArray(ivColumnIds) || ivColumnIds.length < 1) {
+          throw AppError.badRequest("Linear regression requires at least one predictor.");
+        }
         const rows = await datasetRepository.getRows(datasetId);
         const dvKey = String(dvColumnId);
         const ivKeys = ivColumnIds.map(String);
         const complete = rows
           .map((r) => ({ dv: Number(r.data[dvKey]), ivs: ivKeys.map((k) => Number(r.data[k])) }))
           .filter((r) => !Number.isNaN(r.dv) && r.ivs.every((v) => !Number.isNaN(v)));
+
+        if (complete.length <= ivColumnIds.length + 1) {
+          throw AppError.badRequest(`Linear regression needs more than ${ivColumnIds.length + 1} complete observations for this model.`);
+        }
 
         const dvName = await columnName(dvColumnId);
         const ivNames = await Promise.all(ivColumnIds.map(columnName));

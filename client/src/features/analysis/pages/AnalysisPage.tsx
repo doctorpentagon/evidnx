@@ -10,13 +10,19 @@ import { useDataset } from "@/features/data/hooks/useDataset";
 import { useDatasets } from "@/features/data/hooks/useDatasets";
 import { useAnalyses, useRecommendAnalysis, useRunAnalysis } from "../hooks/useAnalysis";
 import type { AnalysisRecord, AnalysisType, TestRecommendation } from "../types/analysis";
+import { RelationshipAnalysisPanel } from "../components/RelationshipAnalysisPanel";
 
 const names: Record<AnalysisType, string> = {
+  descriptive: "Descriptive statistics",
   independent_t_test: "Independent-samples t-test",
   mann_whitney: "Mann–Whitney U test",
   one_way_anova: "One-way ANOVA",
   kruskal_wallis: "Kruskal–Wallis test",
+  correlation: "Correlation",
+  linear_regression: "Linear regression",
 };
+
+const comparisonTypes: AnalysisType[] = ["independent_t_test", "mann_whitney", "one_way_anova", "kruskal_wallis"];
 
 const selectClass = "min-h-11 w-full rounded-md border border-surface-border bg-white px-3 text-sm text-ink focus:border-brand-500";
 
@@ -120,7 +126,7 @@ export function AnalysisPage() {
             <AiPanel title="Why this method"><p>{recommendation.reasoning}</p></AiPanel>
             <h3 className="mb-2 mt-5 font-semibold">Assumption verdicts</h3><div className="grid gap-3 md:grid-cols-2">{recommendation.normalityByGroup.map((item) => <Assumption key={item.group} label={`Normality · ${item.group}`} passed={item.normal} evidence={`${pLabel(item.pValue)} — ${item.normal ? "no clear departure from normality" : "normality concern detected"}.`} />)}<Assumption label="Equal variances · Levene’s test" passed={recommendation.equalVariances !== false} evidence={`${pLabel(recommendation.leveneP)} — ${recommendation.equalVariances === null ? "not required" : recommendation.equalVariances ? "variance assumption is acceptable" : "variances differ; use a robust alternative"}.`} /></div>
             <details className="mt-4 rounded-md bg-surface-canvas p-3 text-sm"><summary className="cursor-pointer font-medium">Methods ruled out and why</summary><ul className="mt-2 space-y-2 text-ink-muted">{recommendation.alternativesRuledOut.map((item) => <li key={item.test}><strong className="text-ink">{item.test}:</strong> {item.reason}</li>)}</ul></details>
-            <div className="mt-5 grid gap-3 sm:grid-cols-[1fr_auto]"><label className="text-sm font-medium">Method to run<select className={`${selectClass} mt-1.5`} value={chosenType ?? ""} onChange={(e) => setChosenType(e.target.value as AnalysisType)}>{Object.entries(names).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label><Button className="sm:self-end" onClick={runSelected} disabled={!chosenType || run.isPending}><FlaskConical className="h-4 w-4" />{run.isPending ? "Computing…" : "Run analysis"}</Button></div>
+            <div className="mt-5 grid gap-3 sm:grid-cols-[1fr_auto]"><label className="text-sm font-medium">Method to run<select className={`${selectClass} mt-1.5`} value={chosenType ?? ""} onChange={(e) => setChosenType(e.target.value as AnalysisType)}>{comparisonTypes.map((value) => <option key={value} value={value}>{names[value]}</option>)}</select></label><Button className="sm:self-end" onClick={runSelected} disabled={!chosenType || run.isPending}><FlaskConical className="h-4 w-4" />{run.isPending ? "Computing…" : "Run analysis"}</Button></div>
             {chosenType !== recommendation.recommendedTest ? <p className="mt-2 text-xs text-warning-600">You overrode the recommended method. EvidNX will preserve that choice in the saved analysis.</p> : null}
           </Card> : null}
 
@@ -129,6 +135,7 @@ export function AnalysisPage() {
 
         <aside className="space-y-5"><Card className="p-4"><div className="flex items-center gap-2"><BarChart3 className="h-5 w-5 text-brand-600" /><h2 className="font-semibold">Live data preview</h2></div><dl className="mt-4 grid grid-cols-3 gap-2 text-center"><div className="rounded-md bg-surface-canvas p-2"><dt className="text-xs text-ink-muted">Rows</dt><dd className="font-semibold">{dataset.data?.rows.length ?? 0}</dd></div><div className="rounded-md bg-surface-canvas p-2"><dt className="text-xs text-ink-muted">Groups</dt><dd className="font-semibold">{chartData.length}</dd></div><div className="rounded-md bg-surface-canvas p-2"><dt className="text-xs text-ink-muted">Variables</dt><dd className="font-semibold">{dataset.data?.columns.length ?? 0}</dd></div></dl><div className="mt-4 space-y-2">{chartData.slice(0, 6).map((item) => <div key={item.group} className="flex justify-between text-sm"><span className="truncate text-ink-muted">{item.group}</span><span className="ml-3 font-medium">M {item.mean.toFixed(2)} · n {item.n}</span></div>)}</div></Card><Card className="p-4"><h2 className="font-semibold">Recent analyses</h2><div className="mt-3 space-y-3">{history.data?.slice(0, 5).map((item) => <button key={item.id} onClick={() => setResult(item)} className="block min-h-11 w-full rounded-md border border-surface-border p-3 text-left hover:border-brand-200"><p className="line-clamp-2 text-sm font-medium">{item.title}</p><p className="mt-1 text-xs text-ink-muted">{item.status} · {new Date(item.createdAt).toLocaleDateString()}</p></button>)}{!history.data?.length ? <p className="text-sm text-ink-muted">Your completed analyses will appear here.</p> : null}</div></Card></aside>
       </div>
+      {dataset.data ? <RelationshipAnalysisPanel key={dataset.data.id} dataset={dataset.data} projectId={currentProjectId} /> : null}
       {(recommend.error || run.error) ? <div className="rounded-md border border-error-100 bg-error-50 p-3 text-sm text-error-600">{(recommend.error ?? run.error)?.message}</div> : null}
     </div>
   );
