@@ -1,0 +1,51 @@
+{
+  "name": "@evidnx/server",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "start": "node dist/index.js",
+    "db:push": "drizzle-kit push",
+    "db:generate": "drizzle-kit generate",
+    "db:seed": "tsx src/infrastructure/seed.ts"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.5.0",
+    "cors": "^2.8.5",
+    "docx": "^9.1.0",
+    "drizzle-orm": "^0.45.2",
+    "exceljs": "^4.4.0",
+    "express": "^4.21.1",
+    "jstat": "^1.9.6",
+    "ml-kmeans": "^6.0.0",
+    "ml-logistic-regression": "^2.0.0",
+    "ml-matrix": "^6.11.1",
+    "ml-pca": "^4.1.1",
+    "ml-regression-multivariate-linear": "^2.0.4",
+    "multer": "^1.4.5-lts.1",
+    "nanoid": "^5.0.9",
+    "papaparse": "^5.5.3",
+    "pdfkit": "^0.15.1",
+    "qrcode": "^1.5.4",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.11",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/multer": "^1.4.12",
+    "@types/node": "^22.10.1",
+    "@types/papaparse": "^5.3.16",
+    "@types/pdfkit": "^0.13.5",
+    "@types/qrcode": "^1.5.5",
+    "drizzle-kit": "^0.31.10",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^3.2.6"
+  }
+}
