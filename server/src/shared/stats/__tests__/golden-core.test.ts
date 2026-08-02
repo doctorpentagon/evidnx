@@ -4,6 +4,7 @@ import { oneSampleTTest, independentTTest } from "../tTest.js";
 import { oneWayAnova } from "../anova.js";
 import { chiSquareTest } from "../chiSquare.js";
 import { pearsonCorrelation, spearmanCorrelation } from "../correlation.js";
+import { cronbachAlpha } from "../reliability.js";
 
 describe("golden statistical core", () => {
   it("matches textbook descriptive statistics", () => {
@@ -53,5 +54,16 @@ describe("golden statistical core", () => {
   it("detects perfect Pearson and Spearman relationships", () => {
     expect(pearsonCorrelation([1, 2, 3, 4], [2, 4, 6, 8]).r).toBeCloseTo(1, 12);
     expect(spearmanCorrelation([1, 2, 3, 4], [40, 30, 20, 10]).r).toBeCloseTo(-1, 12);
+  });
+
+  it("computes perfect reliability and handles two-item deletion safely", () => {
+    const result = cronbachAlpha([
+      { name: "Item 1", values: [1, 2, 3, 4, 5] },
+      { name: "Item 2", values: [1, 2, 3, 4, 5] },
+    ]);
+    expect(result.cronbachAlpha).toBeCloseTo(1, 12);
+    expect(result.standardizedAlpha).toBeCloseTo(1, 12);
+    expect(result.verdict).toBe("excellent");
+    expect(result.itemStats.every((item) => item.alphaIfDeleted === null)).toBe(true);
   });
 });

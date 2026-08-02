@@ -1,4 +1,4 @@
-export type AnalysisType = "descriptive" | "independent_t_test" | "mann_whitney" | "one_way_anova" | "kruskal_wallis" | "correlation" | "linear_regression";
+export type AnalysisType = "descriptive" | "independent_t_test" | "mann_whitney" | "one_way_anova" | "kruskal_wallis" | "correlation" | "linear_regression" | "reliability";
 
 export interface TestRecommendation {
   recommendedTest: AnalysisType;

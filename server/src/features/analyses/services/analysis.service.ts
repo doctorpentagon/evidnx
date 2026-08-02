@@ -519,8 +519,12 @@ export const analysisService = {
 
       case "reliability": {
         const { itemColumnIds } = config as { itemColumnIds: number[] };
+        if (!Array.isArray(itemColumnIds) || itemColumnIds.length < 2) {
+          throw AppError.badRequest("Reliability analysis requires at least two numeric scale items.");
+        }
         const names = await Promise.all(itemColumnIds.map(columnName));
         const rows = await pairedNumericRows(datasetId, itemColumnIds);
+        if (rows.length < 3) throw AppError.badRequest("Reliability analysis requires at least three complete responses.");
         const items = names.map((name, i) => ({ name, values: rows.map((r) => r[i]) }));
         const result = cronbachAlpha(items);
         return {
